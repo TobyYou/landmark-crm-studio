@@ -17,6 +17,9 @@ In a separate project we are building an internal image tool, **Studio (上刊�
 `/Users/tobysmacbookpro/地标公司内部销售管理系统/studio/`
 (full design doc: `/Users/tobysmacbookpro/地标公司内部销售管理系统/docs/06-上刊素材精修与大屏替换系统.md`)
 
+The same code and docs are on GitHub (public): https://github.com/TobyYou/landmark-crm-studio
+(`studio/` = the tool, `docs/06` = design and real-photo test results, `docs/07` = this brief). Read it if the local path isn't available to you. Don't push to that repo; hand results back as described in section 8.
+
 Studio is currently generic: it can handle "any flat / curved / corner screen". We now want to **customize it to our 11 specific screens**, because generic geometry estimation is where it fails on real photos. You know these screens from the website work: what each one looks like, which photos show it in daylight and at night, which are corner or curved screens, what surrounds them. **We need you to turn that knowledge into one structured, evidence-backed profile per screen** that Studio can import.
 
 Please read this whole brief first. The task itself is in section 5, and the output format is in section 6.
