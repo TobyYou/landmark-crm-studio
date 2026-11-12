@@ -1,0 +1,9 @@
+{
+  "name": "地标传媒 · 线索公海",
+  "short_name": "线索公海",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f5f7",
+  "theme_color": "#14213d",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

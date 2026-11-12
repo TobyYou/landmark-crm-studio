@@ -1,0 +1,7 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "leads-server", "runtimeExecutable": "node", "runtimeArgs": ["server/server.js"], "port": 3000 },
+    { "name": "studio", "runtimeExecutable": "studio/.venv/bin/python", "runtimeArgs": ["studio/run.py"], "port": 8600 }
+  ]
+}

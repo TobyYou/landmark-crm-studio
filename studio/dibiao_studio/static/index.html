@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>上刊素材工作台 · 地标传媒</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">地标传媒 <span>上刊照片精修与大屏合成</span></div>
+  <nav>
+    <button data-tab="editor" class="active">新建任务</button>
+    <button data-tab="history">历史版本</button>
+    <button data-tab="templates">点位模板</button>
+  </nav>
+</header>
+
+<main id="tab-editor" class="tab active">
+  <aside class="panel" id="side">
+    <section>
+      <h3>① 素材</h3>
+      <div class="drop" id="drop-base"><input type="file" accept="image/*,video/*" hidden>
+        <b>原始上刊照片 / 视频</b><small>点击或拖入；航拍、实拍均可</small><div class="meta"></div></div>
+      <div class="drop" id="drop-ad"><input type="file" accept="image/*,video/*" hidden>
+        <b>客户广告图 / 广告视频</b><small>只精修时可不传</small><div class="meta"></div></div>
+    </section>
+
+    <section>
+      <h3>② 处理模式</h3>
+      <div class="radios" id="mode">
+        <label><input type="radio" name="mode" value="enhance"> A 只精修</label>
+        <label><input type="radio" name="mode" value="enhance_then_replace" checked> B 先精修再替换 <em>推荐</em></label>
+        <label><input type="radio" name="mode" value="replace_then_enhance"> C 先替换再精修</label>
+      </div>
+    </section>
+
+    <section>
+      <h3>③ 屏幕标定</h3>
+      <div class="row">
+        <label>屏幕类型</label>
+        <select id="scr-type">
+          <option value="flat">平面矩形屏</option>
+          <option value="curved">弧形曲面屏</option>
+          <option value="folded">L 型拐角 / 折角 / 多折面屏</option>
+        </select>
+      </div>
+      <div class="row" id="turn-row" hidden>
+        <label>整屏转角(°)</label>
+        <input id="turn-angle" type="number" step="1" min="5" max="175" placeholder="L 型拐角屏填 90">
+      </div>
+      <div class="row">
+        <label>载入模板</label>
+        <select id="tpl-select"><option value="">— 选择已保存点位 —</option></select>
+      </div>
+      <div class="tools" id="tools">
+        <button data-tool="screen" class="active">屏幕点位</button>
+        <button data-tool="occluder">遮挡物</button>
+        <button data-tool="lane-road">车道</button>
+        <button data-tool="lane-walk">人行道</button>
+      </div>
+      <p class="hint" id="hint"></p>
+      <div class="btns">
+        <button id="btn-next-edge">下一步：下边缘</button>
+        <button id="btn-undo">撤销</button>
+        <button id="btn-insert">加一列点</button>
+        <button id="btn-detect">自动识别</button>
+        <button id="btn-clear" class="danger">清空</button>
+      </div>
+      <div class="btns">
+        <button id="btn-snap" title="把点位吸附到屏幕真实边缘（亚像素）">吸附边缘</button>
+        <button id="btn-unwrap" title="把屏幕按物理比例展开：原画面里的字和圆应保持方正">展开检查</button>
+        <button id="btn-lens" title="由屏幕直边估计镜头畸变">估计畸变</button>
+      </div>
+      <details>
+        <summary>物理尺寸 / 宽度分配（防止文字压扁）</summary>
+        <div class="row"><label>宽度分配</label>
+          <select id="u-mode">
+            <option value="auto">自动（由透视反推）</option>
+            <option value="equal">控制点等间距（按箱体缝标点）</option>
+            <option value="physical">按填写的每段物理宽度</option>
+          </select></div>
+        <div class="row"><label>屏幕宽×高(米)</label><input id="phys-w" type="number" step="0.1" placeholder="宽"><input id="phys-h" type="number" step="0.1" placeholder="高"></div>
+        <div class="row"><label>每段宽度(米)</label><input id="seg-w" placeholder="如 12,8（拐角屏两面）"></div>
+        <div class="row"><label>已知焦距(px)</label><input id="focal" type="number" placeholder="留空自动估计"></div>
+      </details>
+      <div class="geo" id="geo-info"></div>
+      <div class="unwrap" id="unwrap-box" hidden><img id="unwrap-img" alt="展开检查"><small>展开检查：原屏画面里的汉字应接近正方形、圆应是正圆、二维码应是正方形。某一面的字被压扁 / 拉宽，说明点位或宽度分配有误（拐角屏先确认“整屏转角”）。</small></div>
+      <div class="row"><input id="tpl-name" placeholder="模板名称，如：国贸弧形屏-东南航拍"><button id="btn-save-tpl">保存模板</button></div>
+      <div id="video-ctl" hidden>
+        <div class="row"><label>帧</label><input id="frame" type="range" min="0" value="0"><span id="frame-no">0</span></div>
+        <div class="btns"><button id="btn-add-kf">在当前帧加关键帧</button><button id="btn-del-kf">删除当前关键帧</button></div>
+        <div class="kfs" id="kf-list"></div>
+      </div>
+      <div id="lane-list" class="lanes"></div>
+    </section>
+
+    <section>
+      <h3>④ 参数</h3>
+      <div id="params"></div>
+    </section>
+
+    <section class="actions">
+      <input id="title" placeholder="任务备注（客户 / 点位 / 档期）">
+      <div class="btns">
+        <button id="btn-preview">快速预览</button>
+        <button id="btn-run" class="primary">正式处理</button>
+      </div>
+      <div class="job" id="job-status"></div>
+    </section>
+  </aside>
+
+  <section class="stage">
+    <div class="canvas-wrap" id="canvas-wrap">
+      <canvas id="cv"></canvas>
+      <div class="empty" id="empty">上传原始照片或视频开始。<br>滚轮缩放 · 右键或空格拖动平移 · 拖动点位微调</div>
+      <div class="zoom"><button id="zoom-fit">适应</button><button id="zoom-100">1:1</button></div>
+    </div>
+    <div class="result" id="result" hidden>
+      <div class="result-head">
+        <b>处理结果</b>
+        <div class="links" id="result-links"></div>
+        <button id="btn-close-result">返回标定</button>
+      </div>
+      <div class="compare" id="compare">
+        <img id="cmp-a"><div class="cmp-top" id="cmp-top"><img id="cmp-b"></div>
+        <div class="cmp-bar" id="cmp-bar"></div>
+        <span class="tag l">原图</span><span class="tag r">成片</span>
+      </div>
+      <div id="video-out"></div>
+      <pre class="report" id="report"></pre>
+    </div>
+  </section>
+</main>
+
+<main id="tab-history" class="tab">
+  <div class="list" id="history"></div>
+</main>
+
+<main id="tab-templates" class="tab">
+  <div class="list" id="templates"></div>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
